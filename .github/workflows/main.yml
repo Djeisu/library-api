@@ -1,0 +1,42 @@
+image: ruby:2.7.0
+
+stages:
+  - test
+  - build
+
+services:
+  - postgres:11.4
+
+variables:
+  PG_HOST: $PG_HOST
+  PG_DB: $PG_DB
+  PG_TEST_DB: $PG_TEST_DB
+  PG_PROD_DB: $PG_PROD_DB
+  PG_USERNAME: $PG_USERNAME
+  PG_PASSWORD: $PG_PASSWORD
+
+test:
+  stage: test
+
+  before_script:
+  - apt-get update
+  - apt-get install -y curl gnupg
+  - curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+  - wget -q -O - https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+  - echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list
+  - apt-get update -yq
+  - apt-get install -y yarn
+
+  script:
+    - apt-get update -qy
+    - apt-get install -y nodejs
+    - bundle check || bundle install --jobs $(nproc)
+    - yarn install
+    - bundle exec rake db:create db:migrate RAILS_ENV=test
+    - bundle exec rake test
+  coverage: /\(\d+.\d+\%\) covered/
+  only:
+    - dev
+    - master
+    - merge_request
+  when: on_success
