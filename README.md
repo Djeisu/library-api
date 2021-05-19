@@ -13,6 +13,8 @@ Rails Version
 Running the project
 
 rails db:setup
+rails db:migrate
+rails sample:all
 rails s
 
 Running tests
