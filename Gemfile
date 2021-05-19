@@ -12,6 +12,10 @@ gem 'rack-cors'
 gem 'dotenv-rails'
 gem 'devise_token_auth'
 
+gem "shrine"
+gem "mini_magick"
+gem 'aws-sdk-s3', require: false
+
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'pry-rails'
